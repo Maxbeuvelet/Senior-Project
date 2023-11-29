@@ -93,11 +93,6 @@ class Player(pygame.sprite.Sprite):  # pygame.sprite.Sprite a class in the pygam
     def collide_enemy(self):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if hits:
-            for hit in hits:
-                hit.kill()
-                del hit
-            if not self.game.enemies.sprites():
-                print("all enemies are killed")
             self.kill()
             self.game.playing = False
 
