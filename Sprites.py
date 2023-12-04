@@ -66,9 +66,16 @@ class Player(pygame.sprite.Sprite):  # pygame.sprite.Sprite a class in the pygam
 
         self.x_change = 0
         self.y_change = 0
+        self.collide_speed_buff()
+
 
     def movement(self):
         keys = pygame.key.get_pressed()  # This will be a list of every key pressed on the keyboard and stored in keys
+
+        base_speed = PLAYER_SPEED
+        if self.game.player_speed_buff > 0:
+            base_speed += PLAYER_SPEED_BUFF
+
         if keys[pygame.K_LEFT]:  # Check if left arrow key is pressed
             for sprite in self.game.all_sprites:
                 sprite.rect.x += PLAYER_SPEED
@@ -157,6 +164,14 @@ class Player(pygame.sprite.Sprite):  # pygame.sprite.Sprite a class in the pygam
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3:
                     self.animation_loop = 1
+
+    def collide_speed_buff(self):
+        speed = pygame.sprite.spritecollide(self,self.game.speed_buffs, True)
+        if speed:
+            self.game.player_speed_buff = 2
+            print("Speed buff active")
+        else:
+            self.game.player_speed_buff = 0
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -275,6 +290,38 @@ class Ground(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+
+class Road(pygame.sprite.Sprite):
+    def __init__(self,game, x, y):
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+
+        self.image = self.game.terrain_spritesheet.get_sprite(0, 0, self.width, self.width)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+class Water(pygame.sprite.Sprite):
+    def __init__(self,game, x, y):
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+
+        self.image = self.game.terrain_spritesheet.get_sprite(960,300, 50, 50)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
 class Button:
     def __init__(self, x ,y, width, height, fg, bg, content, fontsize):
         self.font = pygame.font.Font('arial.ttf', fontsize)
@@ -385,4 +432,23 @@ class Attack(pygame.sprite.Sprite):
             self.animation_loop += 0.5
             if self.animation_loop >= 5:
                 self.kill()
+
+class SpeedBuff(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites, self.game.blocks, self.game.speed_buffs
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+
+        self.image = pygame.Surface((self.width, self.height))
+        self.image.fill(GREEN)  # Use your desired color or load an image for the speed buff block
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
 
