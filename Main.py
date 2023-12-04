@@ -19,7 +19,10 @@ class Game:
         self.attack_spritesheet = SpriteSheet('img/attack.png')
         self.intro_background = pygame.image.load('./img/introbackground.png')
         self.go_background = pygame.image.load('./img/gameover.png')
+        self.score = 0
+        self.speed_buffs = pygame.sprite.LayeredUpdates()
 
+        self.player_speed_buff = 0
     def createTilemap(self):
         for i, row in enumerate(tilemap):  # i will be the position and row is the value
             for j, column in enumerate(row):
@@ -32,6 +35,12 @@ class Game:
                     Block(self, j, i)
                 if column == "P":
                     self.player = Player(self, j, i)
+                if column == "R":
+                    Road(self, j, i)
+                if column == "W":
+                    Water(self, j, i)
+                if column == "S":
+                    SpeedBuff(self, j, i)
 
     def new(self):  # a new game starts
         self.playing = True
@@ -81,6 +90,7 @@ class Game:
 
         for sprite in self.all_sprites:
             sprite.kill()
+        print(self.score)
 
         while self.running:
             for event in pygame.event.get():
